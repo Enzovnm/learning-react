@@ -54,7 +54,7 @@ const App = () => {
   }
 
   return (
-    <Router>
+    <Router basename="/learning-react">
       <div className="container">
         <Header/>
         <Route path="/" exact render={() => (
@@ -64,7 +64,7 @@ const App = () => {
           </>
         )}
         />
-        <Route path="/:taskTitle" exact component={TaskDetails} />
+        <Route path="learning/:taskTitle" exact component={TaskDetails} />
       </div>
     </Router>
     
