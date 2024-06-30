@@ -1,26 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import {v4 as uuidv4} from 'uuid'
 import "./App.css"
 import Tasks from "./components/Tasks";
 import AddTask from "./components/AddTask";
 import Header from "./components/Header";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import axios from "axios";
+import TaskDetails from "./components/TaskDetails";
+
+
 
 const App = () => {
 
 
-  const [task, setTask] = useState([
-    {
-      id: 1,
-      title: 'Estudar programação',
-      completed : false
-    },    
-    {
-      id: 2,
-      title: 'Ler livros',
-      completed : true
-    },
-  ])
+  const [task, setTask] = useState([])
+
+  useEffect(() =>{
+    const fetchTasks = async () => {
+      const {data} = await axios.get('https://jsonplaceholder.cypress.io/todos?_limit=10')
+      setTask(data)
+    }
+
+    fetchTasks()
+  }, [] )
+
 
   const handleTaskClick = (taskId) => {
     const newTasks = task.map(task => {
@@ -31,6 +35,8 @@ const App = () => {
   }
 
   const handleTaskAddition= (taskTitle) =>{
+    if(!taskTitle) return
+
     const newTasks = [...task, {
       title: taskTitle,
       id : uuidv4(),
@@ -41,20 +47,26 @@ const App = () => {
     setTask(newTasks)
   }
 
-  const handletTaskDeletion = (taskId) => {
+  const handleTaskDeletion = (taskId) => {
     const newTasks = task.filter(task => task.id !== taskId)
 
     setTask(newTasks)
   }
 
   return (
-    <>
+    <Router>
       <div className="container">
         <Header/>
-        <AddTask handleTaskAddition={handleTaskAddition}/>
-        <Tasks tasks = {task} handleTaskClick={handleTaskClick} handletTaskDeletion={handletTaskDeletion}/>
+        <Route path="/" exact render={() => (
+          <>
+            <AddTask handleTaskAddition={handleTaskAddition}/>
+            <Tasks tasks = {task} handleTaskClick={handleTaskClick} handleTaskDeletion={handleTaskDeletion}/>
+          </>
+        )}
+        />
+        <Route path="/:taskTitle" exact component={TaskDetails} />
       </div>
-    </>
+    </Router>
     
   )
 }
